@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pipeline Dashboard – Group 5</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22263a;
+      --border: #2e3350;
+      --accent: #6c63ff;
+      --green: #22c55e;
+      --yellow: #eab308;
+      --red: #ef4444;
+      --text: #e8eaf0;
+      --muted: #8b90a7;
+      --must1: #6c63ff;
+      --must2: #a78bfa;
+      --card-radius: 14px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      min-height: 100vh;
+      padding: 32px 24px;
+    }
+
+    /* ── Section title ── */
+    .section-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: .09em;
+      color: var(--muted);
+      margin-bottom: 14px;
+      margin-top: 36px;
+    }
+
+    /* ── Team section ── */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+      gap: 14px;
+      margin-bottom: 8px;
+    }
+
+    .team-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--card-radius);
+      overflow: hidden;
+      transition: border-color 0.2s, transform 0.2s;
+      text-align: center;
+    }
+
+    .team-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-3px);
+    }
+
+    .team-card .photo-wrap {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      background: var(--surface2);
+    }
+
+    .team-card .photo-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 15%;
+      display: block;
+    }
+
+    .team-card .member-info {
+      padding: 12px 10px 14px;
+    }
+
+    .team-card .member-name {
+      font-size: 0.82rem;
+      font-weight: 700;
+      margin-bottom: 3px;
+      color: var(--text);
+      line-height: 1.3;
+    }
+
+    .team-card .member-role {
+      font-size: 0.68rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .member-badge {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: 0.62rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+
+    .badge-lead   { background: rgba(108,99,255,.18); color: var(--accent); }
+    .badge-se     { background: rgba(34,197,94,.12);  color: var(--green); }
+    .badge-bdr    { background: rgba(234,179,8,.12);  color: var(--yellow); }
+
+    /* ── Dashboard header ── */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding-bottom: 28px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    header span.sub {
+      display: block;
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 400;
+      margin-top: 3px;
+    }
+
+    /* ── KPI cards ── */
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 14px;
+      margin-bottom: 0;
+    }
+
+    .kpi {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--card-radius);
+      padding: 18px 20px;
+    }
+
+    .kpi .label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 7px; }
+    .kpi .value { font-size: 1.55rem; font-weight: 700; }
+    .kpi .value.green  { color: var(--green); }
+    .kpi .value.yellow { color: var(--yellow); }
+    .kpi .value.accent { color: var(--accent); }
+
+    /* ── ACV Calculator ── */
+    .calculator {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--card-radius);
+      padding: 22px;
+    }
+
+    .calc-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .calc-header h2 { font-size: 0.95rem; font-weight: 600; }
+
+    .calc-total {
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: -1px;
+    }
+
+    .calc-items { display: flex; flex-direction: column; gap: 8px; }
+
+    .calc-row {
+      display: grid;
+      grid-template-columns: auto 1fr auto auto;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 13px;
+    }
+
+    .calc-row .owner-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .calc-row .oppty-name {
+      font-size: 0.82rem;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .calc-row .acv-val {
+      font-size: 0.82rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .toggle-btn {
+      width: 34px; height: 19px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+
+    .toggle-btn.on  { background: var(--accent); }
+    .toggle-btn.off { background: var(--border); }
+
+    .toggle-btn::after {
+      content: '';
+      position: absolute;
+      width: 13px; height: 13px;
+      border-radius: 50%;
+      background: white;
+      top: 3px;
+      transition: left 0.2s;
+    }
+
+    .toggle-btn.on::after  { left: 17px; }
+    .toggle-btn.off::after { left: 3px; }
+
+    /* ── Pipeline table ── */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: var(--card-radius);
+      border: 1px solid var(--border);
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.81rem; }
+
+    thead tr { background: var(--surface2); }
+
+    th {
+      padding: 11px 14px;
+      text-align: left;
+      font-size: 0.69rem;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--muted);
+      font-weight: 600;
+      white-space: nowrap;
+      border-bottom: 1px solid var(--border);
+    }
+
+    tbody tr {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--surface2); }
+
+    td { padding: 12px 14px; vertical-align: top; }
+
+    td.oppty { font-weight: 600; min-width: 170px; }
+    td.acv   { font-weight: 700; color: var(--green); white-space: nowrap; }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 20px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: .04em;
+    }
+
+    .badge-1 { background: rgba(108,99,255,.18); color: var(--must1); }
+    .badge-2 { background: rgba(167,139,250,.12); color: var(--must2); }
+
+    .score-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+
+    .score-green  { background: rgba(34,197,94,.15);  color: var(--green);  }
+    .score-yellow { background: rgba(234,179,8,.15);  color: var(--yellow); }
+    .score-red    { background: rgba(239,68,68,.15);  color: var(--red);    }
+
+    /* Risk cell */
+    .risk-cell { display: flex; align-items: flex-start; gap: 8px; }
+
+    .risk-dot {
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 4px;
+    }
+
+    .risk-high   { background: var(--red);    box-shadow: 0 0 6px var(--red); }
+    .risk-medium { background: var(--yellow); box-shadow: 0 0 6px var(--yellow); }
+    .risk-low    { background: var(--green);  box-shadow: 0 0 6px var(--green); }
+
+    .editable {
+      outline: none;
+      border-bottom: 1px dashed transparent;
+      border-radius: 4px;
+      transition: border-color 0.2s, background 0.2s;
+      padding: 2px 4px;
+      min-width: 40px;
+    }
+
+    .editable:focus {
+      border-bottom-color: var(--accent);
+      background: rgba(108,99,255,.08);
+    }
+
+    .risk-select {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 0.69rem;
+      padding: 2px 5px;
+      margin-top: 5px;
+      cursor: pointer;
+    }
+
+    .risk-select:focus { outline: none; border-color: var(--accent); }
+
+    .se-pill {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 20px;
+      font-size: 0.69rem;
+      font-weight: 600;
+    }
+
+    .se-yes { background: rgba(34,197,94,.12); color: var(--green); }
+    .se-no  { background: rgba(239,68,68,.1);  color: var(--red);  }
+
+    td.comments   { color: var(--muted); font-size: 0.76rem; max-width: 240px; }
+    td.mitigation { font-size: 0.78rem; max-width: 210px; }
+    td.owner      { white-space: nowrap; }
+
+    /* owner avatar */
+    .owner-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 9px 3px 4px;
+      border-radius: 20px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      font-size: 0.72rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .owner-avatar {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      object-fit: cover;
+      object-position: center 10%;
+      border: 1px solid var(--border);
+    }
+
+    /* Legend */
+    .legend {
+      display: flex;
+      gap: 18px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+
+    .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    @media (max-width: 640px) {
+      body { padding: 16px 12px; }
+      .calc-total { font-size: 1.4rem; }
+    }
+
+    /* ── Chat widget ── */
+    #chat-fab {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 24px rgba(108,99,255,.55);
+      transition: transform 0.2s, box-shadow 0.2s;
+      z-index: 1000;
+    }
+
+    #chat-fab:hover {
+      transform: scale(1.08);
+      box-shadow: 0 6px 32px rgba(108,99,255,.7);
+    }
+
+    #chat-fab svg { width: 26px; height: 26px; fill: white; }
+
+    #chat-panel {
+      position: fixed;
+      bottom: 96px;
+      right: 28px;
+      width: 380px;
+      max-width: calc(100vw - 32px);
+      height: 520px;
+      max-height: calc(100vh - 120px);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 16px 60px rgba(0,0,0,.6);
+      z-index: 999;
+      overflow: hidden;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    #chat-panel.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(12px) scale(0.97);
+    }
+
+    .chat-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2);
+      flex-shrink: 0;
+    }
+
+    .chat-header .avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #6c63ff, #a78bfa);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .chat-header .avatar svg { width: 18px; height: 18px; fill: white; }
+
+    .chat-header .info { flex: 1; }
+    .chat-header .info .name  { font-size: 0.88rem; font-weight: 700; }
+    .chat-header .info .desc  { font-size: 0.68rem; color: var(--muted); margin-top: 1px; }
+
+    .chat-header .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 5px var(--green);
+      flex-shrink: 0;
+    }
+
+    #chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 14px 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    .msg {
+      max-width: 88%;
+      padding: 9px 13px;
+      border-radius: 14px;
+      font-size: 0.82rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .msg.user {
+      background: var(--accent);
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+
+    .msg.assistant {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
+
+    .msg.assistant ul { margin: 6px 0 0 16px; }
+    .msg.assistant li { margin-bottom: 3px; }
+    .msg.assistant strong { color: #c4b5fd; }
+
+    .msg.typing {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      padding: 12px 16px;
+    }
+
+    .typing-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--muted);
+      animation: bounce 1.2s infinite;
+    }
+
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes bounce {
+      0%,60%,100% { transform: translateY(0); opacity: .5; }
+      30%          { transform: translateY(-5px); opacity: 1; }
+    }
+
+    .chat-suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 8px 14px 2px;
+      flex-shrink: 0;
+    }
+
+    .suggestion-chip {
+      font-size: 0.68rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+      white-space: nowrap;
+    }
+
+    .suggestion-chip:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .chat-input-row {
+      display: flex;
+      gap: 8px;
+      padding: 10px 12px 12px;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    #chat-input {
+      flex: 1;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 0.82rem;
+      padding: 9px 12px;
+      resize: none;
+      outline: none;
+      font-family: inherit;
+      line-height: 1.4;
+      max-height: 90px;
+      transition: border-color 0.2s;
+    }
+
+    #chat-input:focus { border-color: var(--accent); }
+    #chat-input::placeholder { color: var(--muted); }
+
+    #chat-send {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--accent);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      align-self: flex-end;
+      transition: opacity 0.2s;
+    }
+
+    #chat-send:disabled { opacity: 0.4; cursor: default; }
+    #chat-send svg { width: 16px; height: 16px; fill: white; }
+  </style>
+</head>
+<body>
+
+<!-- ── Team ── -->
+<div class="section-title" style="margin-top:0;">Equipo · Group 5</div>
+<div class="team-grid" id="team-grid">
+  <div class="team-card">
+    <div class="photo-wrap"><img src="team/ariadna.png" alt="Ariadna Solis" /></div>
+    <div class="member-info">
+      <div class="member-name">Ariadna Solis</div>
+      <div class="member-role">RVP, Sales</div>
+      <span class="member-badge badge-lead">Team Lead</span>
+    </div>
+  </div>
+  <div class="team-card">
+    <div class="photo-wrap"><img src="team/armando.png" alt="Armando Cruz" /></div>
+    <div class="member-info">
+      <div class="member-name">Armando Cruz</div>
+      <div class="member-role">Account Executive, Digital</div>
+    </div>
+  </div>
+  <div class="team-card">
+    <div class="photo-wrap"><img src="team/maximilian.png" alt="Maximilian Schwartz" /></div>
+    <div class="member-info">
+      <div class="member-name">Maximilian Schwartz</div>
+      <div class="member-role">Cloud Account Executive</div>
+    </div>
+  </div>
+  <div class="team-card">
+    <div class="photo-wrap"><img src="team/samuel.png" alt="Samuel Pastor" /></div>
+    <div class="member-info">
+      <div class="member-name">Samuel Pastor</div>
+      <div class="member-role">Cloud Account Executive</div>
+    </div>
+  </div>
+  <div class="team-card">
+    <div class="photo-wrap"><img src="team/jimena.png" alt="Maria Jimena Duarte" /></div>
+    <div class="member-info">
+      <div class="member-name">Maria Jimena Duarte</div>
+      <div class="member-role">Prime Named AE</div>
+    </div>
+  </div>
+  <div class="team-card">
+    <div class="photo-wrap"><img src="team/fernando.png" alt="Fernando Camacho" /></div>
+    <div class="member-info">
+      <div class="member-name">Fernando Camacho</div>
+      <div class="member-role">Principal Account SE</div>
+      <span class="member-badge badge-se">SE</span>
+    </div>
+  </div>
+  <div class="team-card">
+    <div class="photo-wrap"><img src="team/alejandra.png" alt="Alejandra Ramírez" /></div>
+    <div class="member-info">
+      <div class="member-name">Alejandra Ramírez</div>
+      <div class="member-role">Business Development Rep.</div>
+      <span class="member-badge badge-bdr">BDR</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── Dashboard header ── -->
+<header style="margin-top:36px;">
+  <div>
+    <h1>Pipeline Dashboard</h1>
+    <span class="sub">Group 5 · Sales Opportunities</span>
+  </div>
+</header>
+
+<!-- KPIs -->
+<div class="kpis" id="kpis">
+  <div class="kpi">
+    <div class="label">Total Pipeline ACV</div>
+    <div class="value accent" id="kpi-total">$0</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Must-Win Priority 1</div>
+    <div class="value green" id="kpi-mw1">$0</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Must-Win Priority 2</div>
+    <div class="value yellow" id="kpi-mw2">$0</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Opportunities</div>
+    <div class="value accent" id="kpi-count">0</div>
+  </div>
+</div>
+
+<!-- ACV Calculator -->
+<div class="section-title">ACV Calculator</div>
+<div class="calculator">
+  <div class="calc-header">
+    <h2>Selected ACV Total</h2>
+    <div class="calc-total" id="calc-total">$0</div>
+  </div>
+  <div class="calc-items" id="calc-items"></div>
+</div>
+
+<!-- Pipeline Table -->
+<div class="section-title">Opportunity Pipeline</div>
+<div class="table-wrap">
+  <table id="pipeline-table">
+    <thead>
+      <tr>
+        <th>Opportunity</th>
+        <th>Owner</th>
+        <th>ACV</th>
+        <th>Must Win</th>
+        <th>Biggest Risk</th>
+        <th>Mitigation</th>
+        <th>SE / BDR</th>
+        <th>Scorecard</th>
+        <th>Comments</th>
+      </tr>
+    </thead>
+    <tbody id="table-body"></tbody>
+  </table>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div> High Risk</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--yellow)"></div> Medium Risk</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div> Low / No Risk</div>
+  <div class="legend-item" style="margin-left:12px; font-style:italic; font-size:0.7rem;">Click on Biggest Risk to edit · Toggle rows in calculator</div>
+</div>
+
+<script>
+  const OWNER_COLORS = {
+    Armando:  '#6c63ff',
+    Max:      '#22c55e',
+    Samu:     '#eab308',
+    Fernando: '#f472b6',
+    Ale:      '#38bdf8',
+  };
+
+  const OWNER_PHOTOS = {
+    Armando:  'team/armando.png',
+    Max:      'team/maximilian.png',
+    Samu:     'team/samuel.png',
+    Fernando: 'team/fernando.png',
+    Ale:      'team/alejandra.png',
+  };
+
+  const raw = [
+    { oppty:"Invex – WA AddOn",              owner:"Armando", acv:640000, mustWin:1,
+      risk:"Potential swap at renewal. SMS to WA.",                                riskLevel:"high",
+      mitigation:"Boost plan for consumption within different areas.",              se:"NO",   scorecard:3.09,
+      comments:"Final volume TBD with customer. Boost plan for consumption within different areas." },
+    { oppty:"Invex – Personalization",        owner:"Armando", acv:177000, mustWin:1,
+      risk:"Technical constraint around project scope. Blocker: IT team.",          riskLevel:"high",
+      mitigation:"Involve product team in technical scope definition. Dreamforce.", se:"SE",   scorecard:3.09,
+      comments:"Fernando SE contacts product team to clarify." },
+    { oppty:"PayClip – B2C SMS OTP",          owner:"Armando", acv:124000, mustWin:2,
+      risk:"Internal alignment B2C strategy team with MC. Competitors. No exec sponsorship.", riskLevel:"high",
+      mitigation:"Benchmark competitors. Build at least 1 executive bond.",         se:"NO",   scorecard:3.09,
+      comments:"Champion: Diego. AIM: first meeting." },
+    { oppty:"Grupo Alden – MCA & WA [NB]",    owner:"Max",     acv:86000,  mustWin:1,
+      risk:"CEO approval & CMO relationship.",                                      riskLevel:"high",
+      mitigation:"SF AVP executive visit to reactivate communication.",             se:"SE",   scorecard:3.2,
+      comments:"Reestablish relationship with key stakeholders." },
+    { oppty:"Jetour – MCA & Intelligence [NL]",owner:"Max",    acv:65000,  mustWin:1,
+      risk:"Billing process with individual dealerships.",                          riskLevel:"medium",
+      mitigation:"Benchmark competitors. Reseller meeting.",                        se:"SE",   scorecard:3.5,
+      comments:"To define reseller options for billing blocker." },
+    { oppty:"Wingstop – MCA & Intelligence [NL]",owner:"Max",  acv:80000,  mustWin:2,
+      risk:"Stalled opty. No clear compelling nor internal sponsorship.",           riskLevel:"high",
+      mitigation:"Look for new internal key sponsor. Additional demo session.",     se:"SE",   scorecard:3.0,
+      comments:"Define new demo date & prepare properly." },
+    { oppty:"Ver de Verdad",                  owner:"Max",     acv:25000,  mustWin:2,
+      risk:"Early stage. Still evaluating feasibility.",                            riskLevel:"medium",
+      mitigation:"Scheduled internal team-back and next session Friday Aug 21.",    se:"NO",   scorecard:2.7,
+      comments:"Determine next steps and WA/SMS volumes. Potential for RCS." },
+    { oppty:"Logrand – Loyalty MGT",          owner:"Samu",    acv:80000,  mustWin:1,
+      risk:"Value selling of LM performance for gambling industry.",               riskLevel:"medium",
+      mitigation:"SIC with experts & demo for gambling.",                           se:"SE",   scorecard:3.72,
+      comments:"Define SIC date & pre-SIC workshop for use cases." },
+    { oppty:"Merco – Loyalty MGT",            owner:"Samu",    acv:70000,  mustWin:1,
+      risk:"Budget allocation in Q4.",                                             riskLevel:"medium",
+      mitigation:"Define first scope that matches customer budget.",               se:"SE",   scorecard:4.0,
+      comments:"Define D360 & use cases workshop with Orange, SE & MC team." },
+    { oppty:"PE – Loyalty MGT",               owner:"Samu",    acv:60000,  mustWin:1,
+      risk:"ROI expectations.",                                                    riskLevel:"medium",
+      mitigation:"Define business case for logistics & value selling.",            se:"SE",   scorecard:4.27,
+      comments:"Prepare ROI case with business value team." },
+    { oppty:"Mary Kay – WA",                  owner:"Samu",    acv:45000,  mustWin:1,
+      risk:"Internal alignment with global account team in Salesforce USA.",       riskLevel:"medium",
+      mitigation:"Anticipate & define MX project as local.",                       se:"SE",   scorecard:3.63,
+      comments:"Adding value from Mexico team to protect teaming agreement." },
+    { oppty:"VDE – MCA & WA [NB]",            owner:"Samu",    acv:30000,  mustWin:1,
+      risk:"No risk identified.",                                                  riskLevel:"low",
+      mitigation:"FU with CMO.",                                                   se:"NO",   scorecard:4.2,
+      comments:"FU with CMO on Monterrey next week." },
+    { oppty:"Naturgy – Grandes Clientes",     owner:"Samu",    acv:40000,  mustWin:1,
+      risk:"Scope of project to be defined.",                                      riskLevel:"medium",
+      mitigation:"Alignment with new CIO.",                                        se:"SE",   scorecard:4.09,
+      comments:"SF AVP executive visit to reactivate communication with new CEO." },
+  ];
+
+  const selected   = raw.map(() => true);
+  const riskLevels = raw.map(r => r.riskLevel);
+
+  const fmt = v => '$' + v.toLocaleString('en-US');
+
+  function scoreClass(s) {
+    if (!s) return '';
+    if (s >= 3.7) return 'score-green';
+    if (s >= 3.0) return 'score-yellow';
+    return 'score-red';
+  }
+
+  function riskDotClass(level) {
+    if (level === 'high')   return 'risk-high';
+    if (level === 'medium') return 'risk-medium';
+    return 'risk-low';
+  }
+
+  function updateKPIs() {
+    const total = raw.reduce((s, r) => s + r.acv, 0);
+    const mw1   = raw.filter(r => r.mustWin === 1).reduce((s, r) => s + r.acv, 0);
+    const mw2   = raw.filter(r => r.mustWin === 2).reduce((s, r) => s + r.acv, 0);
+    document.getElementById('kpi-total').textContent = fmt(total);
+    document.getElementById('kpi-mw1').textContent   = fmt(mw1);
+    document.getElementById('kpi-mw2').textContent   = fmt(mw2);
+    document.getElementById('kpi-count').textContent = raw.length;
+  }
+
+  function updateCalcTotal() {
+    const total = raw.reduce((s, r, i) => s + (selected[i] ? r.acv : 0), 0);
+    document.getElementById('calc-total').textContent = fmt(total);
+  }
+
+  function ownerChip(owner) {
+    const color = OWNER_COLORS[owner] || 'var(--muted)';
+    const photo = OWNER_PHOTOS[owner];
+    if (photo) {
+      return `<span class="owner-chip">
+        <img class="owner-avatar" src="${photo}" alt="${owner}" />
+        ${owner}
+      </span>`;
+    }
+    return `<span class="owner-chip">
+      <span style="width:22px;height:22px;border-radius:50%;background:${color};display:inline-block;flex-shrink:0;"></span>
+      ${owner}
+    </span>`;
+  }
+
+  function buildCalc() {
+    const container = document.getElementById('calc-items');
+    container.innerHTML = '';
+    raw.forEach((r, i) => {
+      const color = OWNER_COLORS[r.owner] || 'var(--muted)';
+      const row = document.createElement('div');
+      row.className = 'calc-row';
+      row.innerHTML = `
+        <span class="owner-dot" style="background:${color}"></span>
+        <div class="oppty-name">${r.oppty}</div>
+        <div class="acv-val">${fmt(r.acv)}</div>
+        <button class="toggle-btn ${selected[i] ? 'on' : 'off'}" data-idx="${i}"></button>
+      `;
+      container.appendChild(row);
+    });
+
+    container.querySelectorAll('.toggle-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const i = +btn.dataset.idx;
+        selected[i] = !selected[i];
+        btn.className = 'toggle-btn ' + (selected[i] ? 'on' : 'off');
+        updateCalcTotal();
+      });
+    });
+  }
+
+  function buildTable() {
+    const tbody = document.getElementById('table-body');
+    tbody.innerHTML = '';
+
+    raw.forEach((r, i) => {
+      const tr = document.createElement('tr');
+
+      const scoreHtml = r.scorecard
+        ? `<span class="score-pill ${scoreClass(r.scorecard)}">${r.scorecard}</span>`
+        : `<span style="color:var(--muted)">—</span>`;
+
+      const seHtml = (r.se === 'SE')
+        ? `<span class="se-pill se-yes">SE</span>`
+        : (r.se === 'NO')
+          ? `<span class="se-pill se-no">NO</span>`
+          : `<span style="color:var(--muted)">—</span>`;
+
+      tr.innerHTML = `
+        <td class="oppty">${r.oppty}</td>
+        <td class="owner">${ownerChip(r.owner)}</td>
+        <td class="acv">${fmt(r.acv)}</td>
+        <td><span class="badge badge-${r.mustWin}">P${r.mustWin}</span></td>
+        <td>
+          <div class="risk-cell">
+            <div class="risk-dot ${riskDotClass(riskLevels[i])}" id="risk-dot-${i}"></div>
+            <div>
+              <div class="editable" contenteditable="true" spellcheck="false" id="risk-text-${i}">${r.risk}</div>
+              <select class="risk-select" data-idx="${i}" id="risk-sel-${i}">
+                <option value="high"   ${riskLevels[i]==='high'   ?'selected':''}>High</option>
+                <option value="medium" ${riskLevels[i]==='medium' ?'selected':''}>Medium</option>
+                <option value="low"    ${riskLevels[i]==='low'    ?'selected':''}>Low</option>
+              </select>
+            </div>
+          </div>
+        </td>
+        <td class="mitigation">${r.mitigation}</td>
+        <td>${seHtml}</td>
+        <td>${scoreHtml}</td>
+        <td class="comments">${r.comments}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    document.querySelectorAll('.risk-select').forEach(sel => {
+      sel.addEventListener('change', () => {
+        const i = +sel.dataset.idx;
+        riskLevels[i] = sel.value;
+        document.getElementById('risk-dot-' + i).className = 'risk-dot ' + riskDotClass(riskLevels[i]);
+      });
+    });
+  }
+
+  updateKPIs();
+  buildCalc();
+  updateCalcTotal();
+  buildTable();
+</script>
+
+<!-- ── Chat FAB ── -->
+<button id="chat-fab" title="Pipeline AI Coach" aria-label="Open chat">
+  <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.37 5.07L2 22l4.93-1.37C8.42 21.5 10.15 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm1 15H7v-2h6v2zm2-4H7v-2h8v2zm0-4H7V7h8v2z"/></svg>
+</button>
+
+<!-- ── Chat Panel ── -->
+<div id="chat-panel" class="hidden" role="dialog" aria-label="Pipeline AI Coach">
+  <div class="chat-header">
+    <div class="avatar">
+      <svg viewBox="0 0 24 24"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.38-1 1.72V7h1a7 7 0 0 1 7 7H4a7 7 0 0 1 7-7h1V5.72A2 2 0 0 1 10 4a2 2 0 0 1 2-2M4 15c0 .88.14 1.73.38 2.53A3 3 0 0 0 4 19a3 3 0 0 0 3 3 3 3 0 0 0 2.83-2h4.34A3 3 0 0 0 17 22a3 3 0 0 0 3-3 3 3 0 0 0-.38-1.47C19.86 16.73 20 15.88 20 15H4z"/></svg>
+    </div>
+    <div class="info">
+      <div class="name">Pipeline AI Coach</div>
+      <div class="desc">Powered by Claude · Group 5</div>
+    </div>
+    <div class="status-dot"></div>
+  </div>
+
+  <div id="chat-messages">
+    <div class="msg assistant">Hola! Soy tu Pipeline Coach. Pregúntame sobre cualquier oportunidad, riesgos, estrategias de mitigación o próximas acciones para maximizar el ACV del equipo. 🚀</div>
+  </div>
+
+  <div class="chat-suggestions" id="chat-suggestions">
+    <button class="suggestion-chip">¿Cuál es la opp con mayor riesgo?</button>
+    <button class="suggestion-chip">Acciones para Invex WA</button>
+    <button class="suggestion-chip">¿Cómo maximizar ACV de Samu?</button>
+    <button class="suggestion-chip">Resumen ejecutivo del pipeline</button>
+  </div>
+
+  <div class="chat-input-row">
+    <textarea id="chat-input" rows="1" placeholder="Pregunta sobre una cuenta o estrategia..."></textarea>
+    <button id="chat-send" title="Send">
+      <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+  // ── Chat logic ─────────────────────────────────────────────────────────────
+  const API_URL      = 'http://localhost:8765/api/chat';
+  const fab          = document.getElementById('chat-fab');
+  const panel        = document.getElementById('chat-panel');
+  const messagesEl   = document.getElementById('chat-messages');
+  const inputEl      = document.getElementById('chat-input');
+  const sendBtn      = document.getElementById('chat-send');
+  const suggestionsEl= document.getElementById('chat-suggestions');
+  const history      = []; // [{role, content}]
+  let   busy         = false;
+
+  // Toggle panel
+  fab.addEventListener('click', () => {
+    panel.classList.toggle('hidden');
+    if (!panel.classList.contains('hidden')) {
+      inputEl.focus();
+      scrollBottom();
+    }
+  });
+
+  // Suggestion chips
+  suggestionsEl.querySelectorAll('.suggestion-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      inputEl.value = chip.textContent.trim();
+      sendMessage();
+    });
+  });
+
+  // Send on Enter (Shift+Enter = newline)
+  inputEl.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
+
+  inputEl.addEventListener('input', () => {
+    inputEl.style.height = 'auto';
+    inputEl.style.height = Math.min(inputEl.scrollHeight, 90) + 'px';
+  });
+
+  sendBtn.addEventListener('click', sendMessage);
+
+  function scrollBottom() {
+    setTimeout(() => { messagesEl.scrollTop = messagesEl.scrollHeight; }, 30);
+  }
+
+  function appendMsg(role, text) {
+    const div = document.createElement('div');
+    div.className = 'msg ' + role;
+    div.textContent = text;
+    messagesEl.appendChild(div);
+    scrollBottom();
+    return div;
+  }
+
+  function showTyping() {
+    const div = document.createElement('div');
+    div.className = 'msg typing';
+    div.id = 'typing-indicator';
+    div.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+    messagesEl.appendChild(div);
+    scrollBottom();
+  }
+
+  function removeTyping() {
+    const t = document.getElementById('typing-indicator');
+    if (t) t.remove();
+  }
+
+  // Simple markdown → HTML (bold, bullets)
+  function renderMarkdown(text) {
+    return text
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/^[•\-\*] (.+)$/gm, '<li>$1</li>')
+      .replace(/(<li>[\s\S]+?<\/li>)(?=\s*<li>|$)/g, m => `<ul>${m}</ul>`)
+      .replace(/\n/g, '<br>');
+  }
+
+  async function sendMessage() {
+    const text = inputEl.value.trim();
+    if (!text || busy) return;
+
+    // Hide suggestions after first message
+    suggestionsEl.style.display = 'none';
+
+    busy = true;
+    sendBtn.disabled = true;
+    inputEl.value = '';
+    inputEl.style.height = 'auto';
+
+    appendMsg('user', text);
+    history.push({ role: 'user', content: text });
+    showTyping();
+
+    try {
+      const res  = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: history }),
+      });
+      const data = await res.json();
+      removeTyping();
+
+      if (data.error) {
+        appendMsg('assistant', '⚠️ ' + data.error);
+      } else {
+        const div = document.createElement('div');
+        div.className = 'msg assistant';
+        div.innerHTML = renderMarkdown(data.reply);
+        messagesEl.appendChild(div);
+        scrollBottom();
+        history.push({ role: 'assistant', content: data.reply });
+      }
+    } catch (err) {
+      removeTyping();
+      appendMsg('assistant', '⚠️ No se pudo conectar al servidor. Asegúrate de que el servidor esté corriendo:\n\npython3 pipeline-server.py');
+    }
+
+    busy = false;
+    sendBtn.disabled = false;
+    inputEl.focus();
+  }
+</script>
+</body>
+</html>
